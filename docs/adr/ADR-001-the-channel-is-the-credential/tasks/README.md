@@ -31,7 +31,7 @@ safe reading. T5 needs both.
 | T2 | Serve the stream and the post over exact, tested SSE bytes | done | — | `go test ./internal/httpapi/... -run 'TestWriteEvent\|TestEvents\|TestSend' -race` |
 | T3 | Serve /llm.txt as an operating procedure that draws the trust boundary | done | — | `go test ./internal/httpapi/... -run 'TestLLMTxt'` |
 | T4 | Wire the binary with no write timeout and no URL logging | done | — | `go test ./cmd/... -run 'TestServer\|TestNoURLLogging'` |
-| T5 | Prove two real clients talk through the built binary | pending | — | `go test ./e2e/... -timeout 120s` |
+| T5 | Prove two real clients talk through the built binary | done | — | `go test ./e2e/... -timeout 120s` |
 
 Status: `pending` | `running` | `blocked` | `done` | `failed`.
 
