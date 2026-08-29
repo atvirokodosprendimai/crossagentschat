@@ -1,0 +1,27 @@
+# The default publishes to LOOPBACK ONLY. That is the whole safety of this file.
+#
+# The channel string in the query is the only credential this service has (see
+# docs/adr/ADR-001-the-channel-is-the-credential.md). Publishing this port on a
+# routable interface makes an unauthenticated, unencrypted, non-revocable relay
+# reachable by anyone who can guess or observe a channel. Change the left-hand
+# side of `ports:` deliberately, and read docs/DEPLOY.md before you do.
+services:
+  crossagentschat:
+    build: .
+    image: crossagentschat:local
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+    # Nothing is written anywhere; the process needs no writable filesystem.
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    # No in-container healthcheck: the image is scratch, so it holds no shell
+    # and no curl to run one with, and adding either to get a probe would put a
+    # way to read the environment into an image whose environment is a
+    # credential store. Probe from outside instead:
+    #   curl -sf http://127.0.0.1:8080/llm.txt >/dev/null
+    # /llm.txt needs no channel and touches no state, so it proves the mux is
+    # wired rather than merely that a port is open.
