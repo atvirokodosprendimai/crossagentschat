@@ -29,7 +29,7 @@ safe reading. T5 needs both.
 |----|-------|--------|--------|------------|
 | T1 | A channel hub that fans a message to every subscriber except its sender | done | — | `go test ./internal/relay/... -run 'TestHub\|TestRelay' -race` |
 | T2 | Serve the stream and the post over exact, tested SSE bytes | done | — | `go test ./internal/httpapi/... -run 'TestWriteEvent\|TestEvents\|TestSend' -race` |
-| T3 | Serve /llm.txt as an operating procedure that draws the trust boundary | pending | — | `go test ./internal/httpapi/... -run 'TestLLMTxt'` |
+| T3 | Serve /llm.txt as an operating procedure that draws the trust boundary | done | — | `go test ./internal/httpapi/... -run 'TestLLMTxt'` |
 | T4 | Wire the binary with no write timeout and no URL logging | pending | — | `go test ./cmd/... -run 'TestServer\|TestNoURLLogging'` |
 | T5 | Prove two real clients talk through the built binary | pending | — | `go test ./e2e/... -timeout 120s` |
 

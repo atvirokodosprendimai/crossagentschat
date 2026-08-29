@@ -44,6 +44,7 @@ type route struct {
 // A second list kept beside this one is exactly the drift the check exists to
 // prevent, which is why Paths derives from here rather than repeating it.
 var routes = []route{
+	{http.MethodGet, "/llm.txt", func(h *handler) http.HandlerFunc { return h.getLLMTxt }},
 	{http.MethodGet, "/events", func(h *handler) http.HandlerFunc { return h.getEvents }},
 	{http.MethodPost, "/send", func(h *handler) http.HandlerFunc { return h.postSend }},
 }

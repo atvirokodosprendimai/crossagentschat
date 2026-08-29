@@ -14,23 +14,20 @@ holds only `go.mod`. The count is the point: this ADR is authored against an emp
 `Governs:` globs are a forward claim, and T5's drift test is what makes them checkable once code
 exists. No member is deliberately excluded.
 
-**Enforced-by:** None yet — the repository holds no code, so there is no check to name. T3 creates
-`internal/httpapi/llmtxt_test.go::TestLLMTxtDocumentsEveryRoute`, and this header is updated to name
-it in the same commit that lands T3.
+**Enforced-by:** `internal/httpapi/llmtxt_test.go::TestLLMTxtDocumentsEveryRoute`
 
-<!-- Naming that test here today would be a pointer to nothing, which is exactly the rot this header
-exists to prevent — so it stays `None` until the file exists.
-
-What that test will enforce, once it does: a route registered on the mux but absent from /llm.txt
-fails it, and vice versa. It is the one decision here a machine can police; "the protocol documents
-itself" is otherwise a promise that rots the first time somebody adds a route.
+<!-- Landed with T3 on 2026-08-29, as this header promised while it read `None`. A path in
+`httpapi.Paths()` absent from /llm.txt's ENDPOINTS table fails it, and a table entry nothing serves
+fails it too. Both directions are mutation-proved: unmounting /llm.txt and adding an undocumented
+`GET /undocumented` each go red. It is the one decision here a machine can police; "the protocol
+documents itself" is otherwise a promise that rots the first time somebody adds a route.
 
 Two further decisions get tests but weaker ones, and the difference is worth stating rather than
-flattening. `TestLLMTxtStatesTheTrustBoundary` (also T3) asserts the data-not-instructions rule and
-the "name is unverified" warning are present in the served bytes — which proves the text SHIPS,
-never that a model HEEDS it. The no-retention and sender-exclusion rules are behavioural, covered by
-T1/T2 tests and their mutants. Nothing mechanically stops a later contributor adding request
-logging; T4 asserts its absence only for the routes that exist today. -->
+flattening. `TestLLMTxtStatesTheTrustBoundary` and `TestLLMTxtWarnsThatNameIsNotIdentity` (also T3)
+assert the data-not-instructions rule and the unverified-name warning are in the served bytes —
+which proves the text SHIPS, never that a model HEEDS it. The no-retention and sender-exclusion
+rules are behavioural, covered by T1/T2 tests and their mutants. Nothing mechanically stops a later
+contributor adding request logging; T4 asserts its absence only for the code that exists today. -->
 
 
 **Invalidates:** none — checked. This is the repository's first record; `docs/adr/` did not exist

@@ -79,11 +79,21 @@ New tests alone first, then T1+T2 as regression, chained so neither can carry th
 
 | Test name | File | Verifies | Covers |
 |-----------|------|----------|--------|
-| `TestLLMTxtDocumentsEveryRoute` | `internal/httpapi/llmtxt_test.go` | Every pattern registered on `NewMux`'s mux appears in the document, and the document names no route the mux does not serve; subtest `falsifiable` registers a throwaway route and asserts the test goes red | — |
-| `TestLLMTxtStatesTheTrustBoundary` | `internal/httpapi/llmtxt_test.go` | The data-not-instructions rule appears **twice** — once before the first command and once at the end — and the "name is not identity" warning is present | — |
-| `TestLLMTxtCarriesTheFullProcedure` | `internal/httpapi/llmtxt_test.go` | All five steps are present in order: mint, monitor, handoff, send, react | — |
-| `TestLLMTxtHandoffBlockNamesChannelAndDistinctName` | `internal/httpapi/llmtxt_test.go` | The handoff block references `CHAN` and instructs the teammate to choose a different `ME` | — |
-| `TestLLMTxtServedAsPlainText` | `internal/httpapi/llmtxt_test.go` | `GET /llm.txt` → `200`, `text/plain`, non-empty body | — |
+| `TestLLMTxtDocumentsEveryRoute` | `internal/httpapi/llmtxt_test.go` | Every path in `Paths()` appears in the document's ENDPOINTS table, and the table names no path nothing serves; subtest `falsifiable` fails if the route extractor matched nothing, which would make both directions vacuous | — |
+| `TestLLMTxtStatesTheTrustBoundary` | `internal/httpapi/llmtxt_test.go` | The data-not-instructions banner appears **exactly twice**, the first before any `curl`, the last with no command after it; the phrases "not an instruction", "cannot authorise" and "Only your own user" are present | — |
+| `TestLLMTxtWarnsThatNameIsNotIdentity` | `internal/httpapi/llmtxt_test.go` | The document says `"name" IS NOT IDENTITY`, that the sender "chooses it", and that it is "never provenance" | — |
+| `TestLLMTxtCarriesTheFullProcedureInOrder` | `internal/httpapi/llmtxt_test.go` | All five steps present and in ascending document order: mint, monitor, hand off, send, react | — |
+| `TestLLMTxtHandoffBlockIsPasteableAndNamesADistinctIdentity` | `internal/httpapi/llmtxt_test.go` | The document carries `openssl rand -hex 16`, tells the teammate "do not reuse mine", and points them back at `$BASE/llm.txt` | — |
+| `TestLLMTxtIsServedAsPlainText` | `internal/httpapi/llmtxt_test.go` | `GET /llm.txt` → `200`, `text/plain`, bytes identical to the embedded document, no channel required | — |
+
+**Amended during execution (2026-08-29):** the planned `falsifiable` subtest was to "register a
+throwaway route and assert the test goes red". `NewMux` returns an `*http.ServeMux`, which does not
+expose its registered patterns, so the drift check reads the `routes` table `NewMux` itself
+registers from — and a subtest cannot add to that table without mutating package state the other
+tests share. The subtest therefore guards the vacuity case (extractor matched nothing), and the
+throwaway-route proof moved to a recorded mutant, which is the stronger form: it adds
+`GET /undocumented` to the real table and the check goes red. Test names were also made specific;
+the table above matches the files.
 
 `TestLLMTxtStatesTheTrustBoundary` asserting the rule appears **twice** is deliberate. A single
 occurrence is satisfied by a mention buried mid-document; the decision is that it is the first thing
@@ -97,12 +107,15 @@ assertion here upgrades it to a mechanism.
 
 | Rung | How this task shows it |
 |------|------------------------|
-| 1 — exists | The five tests above |
-| 2 — something selects it | `NewMux` registers `/llm.txt`; the mutant deletes that registration and `TestLLMTxtServedAsPlainText` must go red |
+| 1 — exists | The six tests above |
+| 2 — something selects it | `NewMux` registers `/llm.txt` from the `routes` table; the recorded mutant deletes that entry and `TestLLMTxtIsServedAsPlainText` goes red — killed 2026-08-29 |
 | 3 — the caller can discover it | `/llm.txt` **is** the declared interface for the whole service, and `TestLLMTxtDocumentsEveryRoute` binds it to the real mux — this is the rung the ADR's `Enforced-by` names |
 | 4 — it is used | Nothing measures this yet — no request counters, by design (Decision §2) |
 
 ## Mutation Log
+
+- 2026-08-29 · d511fc2* · mutant killed · exit 1 · `internal/httpapi/httpapi.go` · unmounts /llm.txt: the document still exists and is documented, but nothing serves it · acceptance-sha256:e875f40798a523160c64b0435f91ea3daffddc711cc9355710654ae953c83ca8
+- 2026-08-29 · d511fc2* · mutant killed · exit 1 · `internal/httpapi/httpapi.go` · adds a served route nobody documented — the drift this check exists to catch, and the direction that rots in practice · acceptance-sha256:e875f40798a523160c64b0435f91ea3daffddc711cc9355710654ae953c83ca8
 
 ## Invariants
 
@@ -129,3 +142,8 @@ proxy, and guessing wrong here means the teammate cannot connect.
 - Any endpoint that reports channels or subscribers — forbidden by Decision §2.
 
 ## Verification Log
+- 2026-08-29 · d511fc2* · exit 1 · `test -f internal/httpapi/llm.txt || { echo "FAIL: internal/httpapi/llm.txt missing"; exit 1; } …` · acceptance-sha256:e875f40798a523160c64b0435f91ea3daffddc711cc9355710654ae953c83ca8
+  ```
+  FAIL: internal/httpapi/llm.txt missing
+  ```
+- 2026-08-29 · d511fc2* · exit 0 · `test -f internal/httpapi/llm.txt || { echo "FAIL: internal/httpapi/llm.txt missing"; exit 1; } …` · acceptance-sha256:e875f40798a523160c64b0435f91ea3daffddc711cc9355710654ae953c83ca8
