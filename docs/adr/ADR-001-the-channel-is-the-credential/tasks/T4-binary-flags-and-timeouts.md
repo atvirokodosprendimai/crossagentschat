@@ -86,6 +86,10 @@ and the ADR says so rather than claiming more.
 
 ## Mutation Log
 
+- 2026-08-29 · 9adbdb3* · mutant killed · exit 1 · `cmd/crossagentschat/main.go` · reintroduces a write deadline, which silently kills every long-lived SSE stream · acceptance-sha256:3d4fa31fcdd360328d4cef35761be4e9c4cc1845d4c8339065d2e343d692c725
+- 2026-08-29 · 9adbdb3* · mutant killed · exit 1 · `cmd/crossagentschat/main.go` · composition root stops wiring the real mux: every package still compiles and passes its own tests while the binary serves nothing · acceptance-sha256:3d4fa31fcdd360328d4cef35761be4e9c4cc1845d4c8339065d2e343d692c725
+- 2026-08-29 · 9adbdb3* · mutant killed · exit 1 · `internal/httpapi/events.go` · adds the exact violation the source guard forbids: a logging call receiving the request URL, which carries the channel credential · acceptance-sha256:3d4fa31fcdd360328d4cef35761be4e9c4cc1845d4c8339065d2e343d692c725
+
 ## Invariants
 
 - `WriteTimeout` is 0 on the served server.
@@ -111,3 +115,8 @@ the ADR settled.
 - Metrics, health checks, readiness probes (see Stop Condition).
 
 ## Verification Log
+- 2026-08-29 · 9adbdb3 · exit 1 · `test -f cmd/crossagentschat/main.go || { echo "FAIL: cmd/crossagentschat/main.go missing"; exit 1; } …` · acceptance-sha256:3d4fa31fcdd360328d4cef35761be4e9c4cc1845d4c8339065d2e343d692c725
+  ```
+  FAIL: cmd/crossagentschat/main.go missing
+  ```
+- 2026-08-29 · 9adbdb3* · exit 0 · `test -f cmd/crossagentschat/main.go || { echo "FAIL: cmd/crossagentschat/main.go missing"; exit 1; } …` · acceptance-sha256:3d4fa31fcdd360328d4cef35761be4e9c4cc1845d4c8339065d2e343d692c725
