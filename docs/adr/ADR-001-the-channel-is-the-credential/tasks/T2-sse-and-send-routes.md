@@ -91,6 +91,9 @@ bug appears — asserting on the handler in isolation proves nothing.
 
 ## Mutation Log
 
+- 2026-08-29 · 399fcc9* · mutant killed · exit 1 · `internal/httpapi/httpapi.go` · unmounts POST /send: the handler still compiles and is tested, but nothing serves it · acceptance-sha256:5a95fe6f6c455c3984235734f6180d8fa2e9d799182a75c000cea4720974c055
+- 2026-08-29 · 399fcc9* · mutant killed · exit 1 · `internal/httpapi/events.go` · stops clearing the per-stream write deadline: a server WriteTimeout then kills every long-lived SSE stream silently · acceptance-sha256:5a95fe6f6c455c3984235734f6180d8fa2e9d799182a75c000cea4720974c055
+
 ## Invariants
 
 - SSE bytes are produced in exactly one function (`writeEvent`); no handler writes frames by hand.
@@ -115,3 +118,8 @@ hints). That is a wire-contract change and belongs in the ADR before it is writt
 - End-to-end two-client behaviour over a real socket — T5.
 
 ## Verification Log
+- 2026-08-29 · 399fcc9* · exit 1 · `test -f internal/httpapi/httpapi.go || { echo "FAIL: internal/httpapi/httpapi.go missing"; exit 1; } …` · acceptance-sha256:5a95fe6f6c455c3984235734f6180d8fa2e9d799182a75c000cea4720974c055
+  ```
+  FAIL: internal/httpapi/httpapi.go missing
+  ```
+- 2026-08-29 · 399fcc9* · exit 0 · `test -f internal/httpapi/httpapi.go || { echo "FAIL: internal/httpapi/httpapi.go missing"; exit 1; } …` · acceptance-sha256:5a95fe6f6c455c3984235734f6180d8fa2e9d799182a75c000cea4720974c055
